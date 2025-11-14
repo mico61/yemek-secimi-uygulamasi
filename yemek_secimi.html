@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bugün Ne Yiyeceğiz?</title>
+    <style>
+        /* CSS Başlangıcı */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #4CAF50;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+        h2 {
+            color: #2196F3;
+            margin-bottom: 25px;
+            font-size: 1.5em;
+        }
+        .options-group {
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .option-button {
+            background-color: #FF9800;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+        .option-button:hover {
+            background-color: #e68a00;
+            transform: translateY(-2px);
+        }
+        .result {
+            margin-top: 30px;
+            padding: 20px;
+            border: 2px solid #4CAF50;
+            border-radius: 8px;
+            background-color: #e8f5e9;
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #388E3C;
+        }
+        /* CSS Sonu */
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🍽️ Bugün Ne Yiyeceğiz?</h1>
+
+    <div id="content">
+        <h2>1) Evde mi yiyeceksin, dışarıda mı?</h2>
+        <div class="options-group">
+            <button class="option-button" onclick="handleLocation('evde')">Evde</button>
+            <button class="option-button" onclick="handleLocation('disarda')">Dışarıda</button>
+        </div>
+    </div>
+    
+</div>
+
+<script>
+    // JavaScript Başlangıcı
+
+    const contentDiv = document.getElementById('content');
+
+    // Seçimlerinizi ve sonuçlarınızı tanımlayan veri yapısı
+    const menuData = {
+        evde: [
+            'Tavuk pilav',
+            'Makarna',
+            'Tavuksote',
+            'Kuru fasulye pilav'
+        ],
+        disarda: {
+            question: 'Canın ne çekiyor?',
+            options: {
+                tavuk: ['Cajun hut', 'Mix tacos'],
+                burger: ['Burger king', 'Popoyes'],
+                döner: ['Çınar', 'Maydonoz', 'Donis'],
+                'pide lahmacun': ['Kanatçı Yasin', 'Divan'],
+                'sokak lezzetleri': ['Ay Sandiviç', 'Bi dolu kumru', 'Kampüs']
+            }
+        }
+    };
+
+    // 1. Soru (Evde / Dışarıda) Cevaplayıcısı
+    function handleLocation(location) {
+        if (location === 'evde') {
+            displayHomeOptions();
+        } else {
+            displayOutsideQuestion();
+        }
+    }
+
+    // Evde Seçeneği Sonuçlarını Gösteren Fonksiyon
+    function displayHomeOptions() {
+        let html = '<h2>Evde Ne Yesen İyi Olur? (Rastgele Seçim)</h2>';
+        html += '<div class="options-group">';
+        
+        // Evdeki tüm seçenekleri göster
+        menuData.evde.forEach(meal => {
+            html += `<button class="option-button" style="background-color: #4CAF50;" onclick="displayResult('${meal}')">${meal}</button>`;
+        });
+        
+        html += '</div>';
+        
+        // Rastgele seçim yapma butonu
+        html += '<div style="margin-top: 25px;">';
+        html += '<button class="option-button" style="background-color: #00bcd4;" onclick="chooseRandomHome()">Bana Karar Ver!</button>';
+        html += '</div>';
+
+        contentDiv.innerHTML = html;
+    }
+    
+    // Evde Seçeneği İçin Rastgele Sonuç Seçen Fonksiyon
+    function chooseRandomHome() {
+        const options = menuData.evde;
+        const randomIndex = Math.floor(Math.random() * options.length);
+        displayResult(options[randomIndex]);
+    }
+
+    // Dışarıda Seçeneği İçin Soruyu Gösteren Fonksiyon
+    function displayOutsideQuestion() {
+        const question = menuData.disarda.question;
+        const options = menuData.disarda.options;
+        
+        let html = `<h2>${question}</h2>`;
+        html += '<div class="options-group">';
+        
+        // Dışarıdaki ana kategorileri göster
+        for (const category in options) {
+            // Buton metnini düzenle (pide lahmacun -> Pide / Lahmacun)
+            const buttonText = category.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+            
+            html += `<button class="option-button" onclick="displayOutsideOptions('${category}')">${buttonText}</button>`;
+        }
+        
+        html += '</div>';
+        contentDiv.innerHTML = html;
+    }
+
+    // Dışarıda Kategorisi Seçeneklerini Gösteren Fonksiyon
+    function displayOutsideOptions(category) {
+        const options = menuData.disarda.options[category];
+        
+        let html = `<h2>${category.toUpperCase()} İçin Mekan Seçenekleri</h2>`;
+        html += '<div class="options-group">';
+        
+        // Seçilen kategorideki mekanları göster
+        options.forEach(place => {
+            html += `<button class="option-button" style="background-color: #2196F3;" onclick="displayResult('${place}')">${place}</button>`;
+        });
+        
+        html += '</div>';
+        
+        // Rastgele seçim yapma butonu
+        html += '<div style="margin-top: 25px;">';
+        html += `<button class="option-button" style="background-color: #00bcd4;" onclick="chooseRandomOutside('${category}')">Bana Karar Ver!</button>`;
+        html += '</div>';
+
+        contentDiv.innerHTML = html;
+    }
+    
+    // Dışarıda Seçeneği İçin Rastgele Mekan Seçen Fonksiyon
+    function chooseRandomOutside(category) {
+        const options = menuData.disarda.options[category];
+        const randomIndex = Math.floor(Math.random() * options.length);
+        displayResult(options[randomIndex]);
+    }
+
+    // Nihai Sonucu Gösteren Fonksiyon
+    function displayResult(choice) {
+        contentDiv.innerHTML = `
+            <h2>👏 Harika! Kararın:</h2>
+            <div class="result">${choice}</div>
+            <div style="margin-top: 30px;">
+                <button class="option-button" style="background-color: #F44336;" onclick="location.reload()">Baştan Başla</button>
+            </div>
+        `;
+    }
+
+    // JavaScript Sonu
+</script>
+
+</body>
+</html>
