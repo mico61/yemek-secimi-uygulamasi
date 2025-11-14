@@ -90,126 +90,157 @@
 <script>
     // JavaScript Başlangıcı
 
-    const contentDiv = document.getElementById('content');
+const contentDiv = document.getElementById('content');
 
-    // Seçimlerinizi ve sonuçlarınızı tanımlayan veri yapısı
-    const menuData = {
-        evde: [
-            'Tavuk pilav',
-            'Makarna',
-            'Tavuksote',
-            'Kuru fasulye pilav'
-        ],
-        disarda: {
-            question: 'Canın ne çekiyor?',
-            options: {
-                tavuk: ['Cajun hut', 'Mix tacos'],
-                burger: ['Burger king', 'Popoyes'],
-                döner: ['Çınar', 'Maydonoz', 'Donis'],
-                'pide lahmacun': ['Kanatçı Yasin', 'Divan'],
-                'sokak lezzetleri': ['Ay Sandiviç', 'Bi dolu kumru', 'Kampüs']
-            }
-        }
-    };
-
-    // 1. Soru (Evde / Dışarıda) Cevaplayıcısı
-    function handleLocation(location) {
-        if (location === 'evde') {
-            displayHomeOptions();
-        } else {
-            displayOutsideQuestion();
+// Seçimlerinizi ve sonuçlarınızı tanımlayan veri yapısı
+const menuData = {
+    evde: [
+        'Tavuk pilav',
+        'Makarna',
+        'Tavuksote',
+        'Kuru fasulye pilav'
+    ],
+    disarda: {
+        question: 'Canın ne çekiyor?',
+        options: {
+            tavuk: ['Cajun hut', 'Mix tacos'],
+            burger: ['Burger king', 'Popoyes'],
+            döner: ['Çınar', 'Maydonoz', 'Donis'],
+            'pide lahmacun': ['Kanatçı Yasin', 'Divan'],
+            'sokak lezzetleri': ['Ay Sandiviç', 'Bi dolu kumru', 'Kampüs']
         }
     }
+};
 
-    // Evde Seçeneği Sonuçlarını Gösteren Fonksiyon
-    function displayHomeOptions() {
-        let html = '<h2>Evde Ne Yesen İyi Olur? (Rastgele Seçim)</h2>';
-        html += '<div class="options-group">';
-        
-        // Evdeki tüm seçenekleri göster
-        menuData.evde.forEach(meal => {
-            html += `<button class="option-button" style="background-color: #4CAF50;" onclick="displayResult('${meal}')">${meal}</button>`;
-        });
-        
-        html += '</div>';
-        
-        // Rastgele seçim yapma butonu
-        html += '<div style="margin-top: 25px;">';
-        html += '<button class="option-button" style="background-color: #00bcd4;" onclick="chooseRandomHome()">Bana Karar Ver!</button>';
-        html += '</div>';
+// İlk Ekranı Gösteren Fonksiyon
+function displayInitialQuestion() {
+    let html = '<h2>1) Evde mi yiyeceksin, dışarıda mı?</h2>';
+    html += '<div class="options-group">';
+    html += '<button class="option-button" onclick="handleLocation(\'evde\')">Evde</button>';
+    html += '<button class="option-button" onclick="handleLocation(\'disarda\')">Dışarıda</button>';
+    html += '</div>';
+    contentDiv.innerHTML = html;
+}
 
-        contentDiv.innerHTML = html;
+// 1. Soru (Evde / Dışarıda) Cevaplayıcısı
+function handleLocation(location) {
+    if (location === 'evde') {
+        displayHomeOptions();
+    } else {
+        displayOutsideQuestion();
+    }
+}
+
+// Evde Seçeneği Sonuçlarını Gösteren Fonksiyon (2. Ekran)
+function displayHomeOptions() {
+    let html = '<h2>Evde Ne Yesen İyi Olur?</h2>';
+    html += '<div class="options-group">';
+    
+    // Evdeki tüm seçenekleri göster
+    menuData.evde.forEach(meal => {
+        html += `<button class="option-button" style="background-color: #4CAF50;" onclick="displayResult('${meal}', 'home')">${meal}</button>`;
+    });
+    
+    html += '</div>';
+    
+    // Rastgele seçim yapma butonu ve Geri butonu
+    html += '<div style="margin-top: 25px;">';
+    html += '<button class="option-button" style="background-color: #00bcd4;" onclick="chooseRandomHome()">Bana Karar Ver!</button>';
+    html += `<button class="option-button" style="background-color: #757575; margin-top: 10px;" onclick="displayInitialQuestion()">⬅️ Geri</button>`;
+    html += '</div>';
+
+    contentDiv.innerHTML = html;
+}
+
+// Evde Seçeneği İçin Rastgele Sonuç Seçen Fonksiyon
+function chooseRandomHome() {
+    const options = menuData.evde;
+    const randomIndex = Math.floor(Math.random() * options.length);
+    displayResult(options[randomIndex], 'home');
+}
+
+// Dışarıda Seçeneği İçin Soruyu Gösteren Fonksiyon (2. Ekran)
+function displayOutsideQuestion() {
+    const question = menuData.disarda.question;
+    const options = menuData.disarda.options;
+    
+    let html = `<h2>${question}</h2>`;
+    html += '<div class="options-group">';
+    
+    // Dışarıdaki ana kategorileri göster
+    for (const category in options) {
+        const buttonText = category.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
+        html += `<button class="option-button" onclick="displayOutsideOptions('${category}')">${buttonText}</button>`;
     }
     
-    // Evde Seçeneği İçin Rastgele Sonuç Seçen Fonksiyon
-    function chooseRandomHome() {
-        const options = menuData.evde;
-        const randomIndex = Math.floor(Math.random() * options.length);
-        displayResult(options[randomIndex]);
-    }
+    html += '</div>';
+    
+    // Geri butonu
+    html += `<div style="margin-top: 25px;">`;
+    html += `<button class="option-button" style="background-color: #757575;" onclick="displayInitialQuestion()">⬅️ Geri</button>`;
+    html += `</div>`;
 
-    // Dışarıda Seçeneği İçin Soruyu Gösteren Fonksiyon
-    function displayOutsideQuestion() {
-        const question = menuData.disarda.question;
-        const options = menuData.disarda.options;
-        
-        let html = `<h2>${question}</h2>`;
-        html += '<div class="options-group">';
-        
-        // Dışarıdaki ana kategorileri göster
-        for (const category in options) {
-            // Buton metnini düzenle (pide lahmacun -> Pide / Lahmacun)
-            const buttonText = category.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-            
-            html += `<button class="option-button" onclick="displayOutsideOptions('${category}')">${buttonText}</button>`;
-        }
-        
-        html += '</div>';
-        contentDiv.innerHTML = html;
-    }
+    contentDiv.innerHTML = html;
+}
 
-    // Dışarıda Kategorisi Seçeneklerini Gösteren Fonksiyon
-    function displayOutsideOptions(category) {
-        const options = menuData.disarda.options[category];
-        
-        let html = `<h2>${category.toUpperCase()} İçin Mekan Seçenekleri</h2>`;
-        html += '<div class="options-group">';
-        
-        // Seçilen kategorideki mekanları göster
-        options.forEach(place => {
-            html += `<button class="option-button" style="background-color: #2196F3;" onclick="displayResult('${place}')">${place}</button>`;
-        });
-        
-        html += '</div>';
-        
-        // Rastgele seçim yapma butonu
-        html += '<div style="margin-top: 25px;">';
-        html += `<button class="option-button" style="background-color: #00bcd4;" onclick="chooseRandomOutside('${category}')">Bana Karar Ver!</button>`;
-        html += '</div>';
+// Dışarıda Kategorisi Seçeneklerini Gösteren Fonksiyon (3. Ekran)
+function displayOutsideOptions(category) {
+    const options = menuData.disarda.options[category];
+    
+    let html = `<h2>${category.toUpperCase()} İçin Mekan Seçenekleri</h2>`;
+    html += '<div class="options-group">';
+    
+    // Seçilen kategorideki mekanları göster
+    options.forEach(place => {
+        html += `<button class="option-button" style="background-color: #2196F3;" onclick="displayResult('${place}', 'outside', '${category}')">${place}</button>`;
+    });
+    
+    html += '</div>';
+    
+    // Rastgele seçim yapma butonu ve Geri butonu
+    html += '<div style="margin-top: 25px;">';
+    html += `<button class="option-button" style="background-color: #00bcd4;" onclick="chooseRandomOutside('${category}')">Bana Karar Ver!</button>`;
+    html += `<button class="option-button" style="background-color: #757575; margin-top: 10px;" onclick="displayOutsideQuestion()">⬅️ Geri</button>`;
+    html += '</div>';
 
-        contentDiv.innerHTML = html;
+    contentDiv.innerHTML = html;
+}
+
+// Dışarıda Seçeneği İçin Rastgele Mekan Seçen Fonksiyon
+function chooseRandomOutside(category) {
+    const options = menuData.disarda.options[category];
+    const randomIndex = Math.floor(Math.random() * options.length);
+    displayResult(options[randomIndex], 'outside', category);
+}
+
+// Nihai Sonucu Gösteren Fonksiyon (Son Ekran)
+function displayResult(choice, source, category = null) {
+    let backFunction = '';
+    
+    // Sonuç ekranında Geri butonunun hangi ekrana döneceğini belirle
+    if (source === 'home') {
+        backFunction = 'displayHomeOptions()'; // Evde seçeneklerine dön
+    } else if (source === 'outside') {
+        // Dışarıda seçeneklerine dön, hangi kategoriye ait olduğunu bilmeli
+        backFunction = `displayOutsideOptions('${category}')`; 
     }
     
-    // Dışarıda Seçeneği İçin Rastgele Mekan Seçen Fonksiyon
-    function chooseRandomOutside(category) {
-        const options = menuData.disarda.options[category];
-        const randomIndex = Math.floor(Math.random() * options.length);
-        displayResult(options[randomIndex]);
-    }
+    contentDiv.innerHTML = `
+        <h2>👏 Harika! Kararın:</h2>
+        <div class="result">${choice}</div>
+        <div style="margin-top: 30px;">
+            <button class="option-button" style="background-color: #F44336;" onclick="location.reload()">Baştan Başla</button>
+            <button class="option-button" style="background-color: #757575; margin-top: 10px;" onclick="${backFunction}">⬅️ Geri</button>
+        </div>
+    `;
+}
 
-    // Nihai Sonucu Gösteren Fonksiyon
-    function displayResult(choice) {
-        contentDiv.innerHTML = `
-            <h2>👏 Harika! Kararın:</h2>
-            <div class="result">${choice}</div>
-            <div style="margin-top: 30px;">
-                <button class="option-button" style="background-color: #F44336;" onclick="location.reload()">Baştan Başla</button>
-            </div>
-        `;
-    }
+// Sayfa yüklendiğinde ilk soruyu göster
+window.onload = displayInitialQuestion;
 
-    // JavaScript Sonu
+// JavaScript Sonu
 </script>
 
 </body>
 </html>
+
